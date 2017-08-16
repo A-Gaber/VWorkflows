@@ -41,11 +41,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.Shape;
+import javafx.scene.shape.*;
 
 /**
  *
@@ -62,6 +58,7 @@ public abstract class AbstractFXConnectionSkin implements FXConnectionSkin {
 
     // -- mutable fields
     protected Path connectionPath;
+    protected InteractiveCurve interactiveCurve;
     protected Circle receiverConnectorUI;
     protected VFlow controller;
     protected ConnectorShape senderShape;
@@ -208,25 +205,34 @@ public abstract class AbstractFXConnectionSkin implements FXConnectionSkin {
             }
         };
 
-        MoveTo moveTo = new MoveTo();
-        CubicCurveTo curveTo = new CubicCurveTo();
-        connectionPath = new Path(moveTo, curveTo);
+        //MoveTo moveTo = new MoveTo();
+        //LineTo curveTo = new LineTo();
 
-        moveTo.xProperty().bind(startXBinding);
-        moveTo.yProperty().bind(startYBinding);
+        interactiveCurve = new InteractiveCurve(getParent());
 
-        curveTo.controlX1Property().bind(controlX1Binding);
-        curveTo.controlY1Property().bind(controlY1Binding);
-        curveTo.controlX2Property().bind(controlX2Binding);
-        curveTo.controlY2Property().bind(controlY2Binding);
-        curveTo.xProperty().bind(endXBinding);
-        curveTo.yProperty().bind(endYBinding);
+        interactiveCurve.setStartYBinding(startYBinding);
+        interactiveCurve.setStartXBinding(startXBinding);
+        interactiveCurve.setEndXBinding(endXBinding);
+        interactiveCurve.setEndYBinding(endYBinding);
+        connectionPath = interactiveCurve.getPath();
+
+
+        //moveTo.xProperty().bind(startXBinding);
+        //moveTo.yProperty().bind(startYBinding);
+
+        //curveTo.controlX1Property().bind(controlX1Binding);
+        //curveTo.controlY1Property().bind(controlY1Binding);
+        //curveTo.controlX2Property().bind(controlX2Binding);
+        //curveTo.controlY2Property().bind(controlY2Binding);
+
+        //curveTo.xProperty().bind(endXBinding);
+        //curveTo.yProperty().bind(endYBinding);
     }
 
     protected void initConnectionListener() {
         connectionListener
                 = new DefaultConnectionListener(
-                        skinFactory, controller, receiverConnectorUI);
+                skinFactory, controller, receiverConnectorUI);
     }
 
     protected abstract void makeDraggable();
@@ -315,6 +321,15 @@ public abstract class AbstractFXConnectionSkin implements FXConnectionSkin {
     public void remove() {
         NodeUtil.removeFromParent(connectionPath);
         NodeUtil.removeFromParent(receiverConnectorUI);
+        InteractiveCurve temp = interactiveCurve;
+        InteractiveCurve temp2 = interactiveCurve;
+        while (temp.getbNext() != null) {
+            temp2 = temp.getbNext().getNext();
+            temp.getbNext().remove();
+            temp = temp2;
+
+            System.out.println(temp.getId());
+        }
     }
 
     @Override

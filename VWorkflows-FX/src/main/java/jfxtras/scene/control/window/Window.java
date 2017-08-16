@@ -33,6 +33,7 @@
  */
 package jfxtras.scene.control.window;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +90,7 @@ public class Window extends Control implements SelectableNode {
      * Default css style.
      */
     public static final String DEFAULT_STYLE
-            = "/jfxtras/scene/control/window/default.css";
+            = "default.css";
     /**
      * Default style class for css.
      */
@@ -498,7 +499,11 @@ public class Window extends Control implements SelectableNode {
 
     @Override
     public String getUserAgentStylesheet() {
-        return this.getClass().getResource(DEFAULT_STYLE).toExternalForm();
+        File f = new File("default.css");
+        String fileURI = f.toURI().toString();
+
+
+        return fileURI;
     }
 
     /**

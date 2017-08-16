@@ -36,6 +36,7 @@ package eu.mihosoft.vrl.workflow.fx;
 import eu.mihosoft.vrl.workflow.Connector;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.Node;
+import javafx.scene.layout.Region;
 
 /**
  * Represents a connector "shape" without specifying a particular path.
@@ -80,4 +81,8 @@ public interface ConnectorShape {
      * @return the backing node for this connector shape
      */
     Node getNode();
+
+    Region getRegion();
+
+    void addToRegion(Node node);
 }

@@ -150,4 +150,17 @@ class ConnectorCircle extends Region implements ConnectorShape {
     public Node getNode() {
         return this;
     }
+
+    @Override
+    public Region getRegion() {
+        return this;
+    }
+
+    @Override
+    public void addToRegion(Node node) {
+        this.getChildren().add(node);
+
+    }
+
+
 }
