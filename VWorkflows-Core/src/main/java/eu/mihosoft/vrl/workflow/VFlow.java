@@ -45,6 +45,7 @@ import javafx.collections.ObservableMap;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The {@code VFlow} interface describes a workflow controller. A workflow is a
@@ -378,4 +379,6 @@ public interface VFlow {
     public ObservableList<ThruConnector> getThruInputs();
 
     public ObservableList<ThruConnector> getThruOutputs();
+
+    public Map<String, ConnectionSkin> getConnectionSkinMapUnsynch(SkinFactory skinFactory);
 }

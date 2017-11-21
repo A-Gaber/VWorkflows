@@ -1096,4 +1096,13 @@ class VFlowImpl implements VFlow {
     public ObservableList<ThruConnector> getThruOutputs() {
         return getModel().getThruOutputs();
     }
+
+    public Map<String, ConnectionSkin> getConnectionSkinMapUnsynch(SkinFactory skinFactory) {
+        Map<String, ConnectionSkin> connectionSkinMap = connectionSkins.get(skinFactory);
+        if (connectionSkinMap == null) {
+            connectionSkinMap = new HashMap<>();
+            //connectionSkins.put(skinFactory, connectionSkinMap);
+        }
+        return connectionSkinMap;
+    }
 }
