@@ -36,6 +36,9 @@ package eu.mihosoft.vrl.workflow.skin;
 import eu.mihosoft.vrl.workflow.Connection;
 import eu.mihosoft.vrl.workflow.Connector;
 import javafx.beans.property.ObjectProperty;
+import javafx.util.Pair;
+
+import java.util.ArrayList;
 
 /**
  * Connection skin.
@@ -91,4 +94,10 @@ public interface ConnectionSkin<T extends Connection> extends Skin<Connection> {
      * Moves the receiverUI element to the front.
      */
     void receiverToFront();
+
+    void addBreakpoint(double x,double y);
+
+    void addPoints(ArrayList<Pair> pointList);
+
+    ArrayList<Pair> getPoints();
 }
