@@ -88,11 +88,8 @@ public class InteractiveCurve{
         //if(bPref != null) bPref.toFront();
     }
 
-    public void addBreakPoint(){
-        //LineTo tempL = next;
-        Breakpoint temp = bNext;
-        //temp =
-
+    public void addBreakPoint(double x, double y){
+        handleBreakpointAdd(x,y);
     }
 
     public void setEndXBinding(DoubleBinding endXBinding) {

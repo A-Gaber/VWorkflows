@@ -58,4 +58,6 @@ public interface FXConnectionSkin extends ConnectionSkin<Connection>, FXSkin<Con
      * @return the receiverShape
      */
     ConnectorShape getReceiverShape();
+
+    //void addBreakpoint(double x, double y);
 }

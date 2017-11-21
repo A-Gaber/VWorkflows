@@ -132,8 +132,9 @@ public class Breakpoint {
     public void addToParent(){
         next.addToParent();
         NodeUtil.addToParent(parent,breakPoint);
-        next.getbNext().toFront();
+
         breakPoint.toFront();
+        if(next.getbNext()!=null)next.getbNext().toFront();
     }
 
     public void setPrevCurve(InteractiveCurve prev) {
@@ -162,5 +163,9 @@ public class Breakpoint {
 
     public Circle getBreakPoint() {
         return breakPoint;
+    }
+
+    public String getID(){
+        return id;
     }
 }

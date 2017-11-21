@@ -42,6 +42,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.shape.*;
+import javafx.util.*;
+
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  *
@@ -366,4 +371,48 @@ public abstract class AbstractFXConnectionSkin implements FXConnectionSkin {
     public ConnectorShape getReceiverShape() {
         return receiverShape;
     }
+
+    @Override
+    public void addBreakpoint(double x, double y){
+        interactiveCurve.addBreakPoint(x,y);
+        //printBreakPoint(interactiveCurve);
+
+
+    }
+
+    private void printBreakPoint(InteractiveCurve interactiveCurve){
+        if(interactiveCurve.getbNext() != null) {
+            printBreakPoint(interactiveCurve.getbNext().getNext());
+            System.out.println(interactiveCurve.getbNext().getBreakPoint().getCenterX()+ "   "+interactiveCurve.getbNext().getBreakPoint().getCenterY());
+            System.out.println(interactiveCurve.getbNext().getID());
+        }
+    }
+
+    @Override
+    public ArrayList<javafx.util.Pair> getPoints(){
+        Stack<javafx.util.Pair> pointStack = new Stack<>();
+        ArrayList<javafx.util.Pair> list = new ArrayList<>();
+        InteractiveCurve temp = interactiveCurve;
+        while (temp.getbNext()!=null){
+            pointStack.add(new javafx.util.Pair(temp.getbNext().getBreakPoint().getLayoutX(),temp.getbNext().getBreakPoint().getLayoutY()));
+
+            temp = temp.getbNext().getNext();
+        }
+        while (!pointStack.isEmpty()){
+            list.add(pointStack.pop());
+        }
+
+        return list;
+    }
+
+    @Override
+    public void addPoints(ArrayList<javafx.util.Pair> pointsList){
+        pointsList.forEach(pair -> {
+            addBreakpoint((Double) pair.getKey(),(Double) pair.getValue());
+        });
+
+
+    }
+
+
 }

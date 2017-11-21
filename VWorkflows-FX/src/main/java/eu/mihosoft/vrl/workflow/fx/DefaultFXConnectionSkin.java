@@ -440,4 +440,6 @@ public class DefaultFXConnectionSkin extends AbstractFXConnectionSkin {
         receiverConnectorUI.setMouseTransparent(notEditable);
         connectionPath.setMouseTransparent(notEditable);
     }
+
+
 }
