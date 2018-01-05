@@ -69,11 +69,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import jfxtras.internal.scene.control.skin.window.EditableLabel;
 import jfxtras.scene.control.window.CloseIcon;
 import jfxtras.scene.control.window.MinimizeIcon;
 import jfxtras.scene.control.window.Window;
 import jfxtras.scene.control.window.WindowIcon;
-//import jfxtras.labs.scene.control.window.CloseIcon;
+
 //import jfxtras.labs.scene.control.window.MinimizeIcon;
 //import jfxtras.labs.scene.control.window.Window;
 //import jfxtras.labs.scene.control.window.WindowIcon;
@@ -92,6 +93,7 @@ public final class FlowNodeWindow extends Window {
     private VCanvas content;
     private Pane inputContainer;
     private Pane outputContainer;
+    private EditableLabel e;
     private OptimizableContentPane parentContent;
     private final CloseIcon closeIcon = new CloseIcon(this);
     private final MinimizeIcon minimizeIcon = new MinimizeIcon(this);
@@ -106,12 +108,16 @@ public final class FlowNodeWindow extends Window {
         return closeIcon;
     };
 
+
+
     private Callback<FlowNodeWindow, CloseIcon> hideCloseIcon = (FlowNodeWindow w) -> {
 
         getLeftIcons().remove(closeIcon);
 
         return closeIcon;
     };
+
+
 
     private Callback<FlowNodeWindow, MinimizeIcon> showMinimizeIcon = (FlowNodeWindow w) -> {
         if (!getLeftIcons().contains(minimizeIcon)) {
@@ -177,6 +183,9 @@ public final class FlowNodeWindow extends Window {
         // 
         addCollapseIcon(skin);
         configureCanvas(skin);
+        e = new EditableLabel();
+        getEditableLabels().add(e);
+
     }
 
     private void initListenersAndBindings(final FXFlowNodeSkin skin) {

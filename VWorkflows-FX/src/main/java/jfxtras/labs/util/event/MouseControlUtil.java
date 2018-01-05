@@ -381,8 +381,10 @@ class RectangleSelectionControllerImpl {
             @Override
             public void handle(MouseEvent event) {
 
-                performDrag(root, event);
-                event.consume();
+                if(event.isControlDown()) {
+                    performDrag(root, event);
+                    event.consume();
+                }
             }
         };
 
@@ -390,17 +392,20 @@ class RectangleSelectionControllerImpl {
             @Override
             public void handle(MouseEvent event) {
 
-                performDragBegin(root, event);
-                event.consume();
+                if(event.isControlDown()) {
+                    performDragBegin(root, event);
+                    event.consume();
+                }
             }
         };
 
         mouseReleasedHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-
-                performDragEnd(root, event);
-                event.consume();
+                if(event.isControlDown()) {
+                    performDragEnd(root, event);
+                    event.consume();
+                }
             }
         };
     }

@@ -44,22 +44,18 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ListChangeListener.Change;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.CacheHint;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.SkinBase;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
-import javafx.scene.layout.BorderWidths;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
+import jfxtras.labs.util.event.MouseControlUtil;
 import jfxtras.scene.control.window.SelectableNode;
 import jfxtras.scene.control.window.Window;
 import jfxtras.scene.control.window.WindowIcon;
@@ -98,6 +94,10 @@ public class DefaultWindowSkin extends SkinBase<Window> {
         titleBar = new TitleBar(control);
         titleBar.setTitle("");
         init();
+        titleBar.getLabel().baseTextProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("test name ");
+
+        });
     }
 
     private void init() {
@@ -117,6 +117,8 @@ public class DefaultWindowSkin extends SkinBase<Window> {
         for (WindowIcon i : control.getRightIcons()) {
             titleBar.addRightIcon(i);
         }
+        control.getEditableLabels().get(0).baseTextProperty().bind(titleBar.getLabel().baseTextProperty());
+
 
         control.getLeftIcons().addListener(
                 (ListChangeListener.Change<? extends WindowIcon> change) -> {
@@ -877,6 +879,9 @@ public class DefaultWindowSkin extends SkinBase<Window> {
             }
         }
     }
+    public EditableLabel getEditableLabel(){
+        return titleBar.getLabel();
+    }
 }
 
 class TitleBar extends HBox {
@@ -884,7 +889,8 @@ class TitleBar extends HBox {
     public static final String DEFAULT_STYLE_CLASS = "window-titlebar";
     private final Pane leftIconPane;
     private final Pane rightIconPane;
-    private final Text label = new Text();
+//    private final Text label = new Text();
+    private final EditableLabel label = new EditableLabel();
     private final double iconSpacing = 3;
     Window control;
     // estimated size of "...",
@@ -903,7 +909,11 @@ class TitleBar extends HBox {
         getStylesheets().setAll(w.getStylesheets());
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
-        setSpacing(8);
+        label.getUserAgentStylesheet();
+
+
+        setSpacing(15);
+
 
 //        label.setTextAlignment(TextAlignment.CENTER);
 //        label.getStyleClass().setAll(DEFAULT_STYLE_CLASS);
@@ -912,15 +922,28 @@ class TitleBar extends HBox {
 
         getChildren().add(leftIconPane);
 //        getChildren().add(VFXLayoutUtil.createHBoxFiller());
+        Region r1 = new Region();
+        getChildren().add(r1);
+        r1.setMinWidth(15);
+        this.setHgrow(r1,Priority.ALWAYS);
+
         getChildren().add(label);
+        label.setAlignment(Pos.CENTER);
+        Region r2 = new Region();
+        r2.setMinWidth(15);
+        getChildren().add(r2);
+        this.setHgrow(r2,Priority.ALWAYS);
+
+
 //        getChildren().add(VFXLayoutUtil.createHBoxFiller());
         getChildren().add(rightIconPane);
+
 
         control.boundsInParentProperty().addListener(
                 (ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) -> {
                     if (control.getTitle() == null
-                    || getLabel().getText() == null
-                    || getLabel().getText().isEmpty()) {
+                    || getLabel().getBaseText() == null
+                    || getLabel().getBaseText().isEmpty()) {
                         return;
                     }
 
@@ -930,7 +953,7 @@ class TitleBar extends HBox {
 //                    if (!control.getTitle().equals(getLabel().getText())) {
 //                        if (originalTitleWidth
 //                        + maxIconWidth * 2 + offset < getWidth()) {
-                    getLabel().setText(control.getTitle());
+                    getLabel().setBaseText(control.getTitle());
 //                        }
 //                    } else if (!"...".equals(getLabel().getText())) {
 //                        if (originalTitleWidth
@@ -943,7 +966,7 @@ class TitleBar extends HBox {
     }
 
     public void setTitle(String title) {
-        getLabel().setText(title);
+        getLabel().setBaseText(title);
 
         originalTitleWidth = getLabel().getBoundsInParent().getWidth();
 
@@ -958,6 +981,10 @@ class TitleBar extends HBox {
         // TODO replace with official API
         labelWidth = com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().
                 computeStringWidth(title, label.getFont());
+
+
+
+
 
         requestLayout();
         requestParentLayout();
@@ -1031,7 +1058,7 @@ class TitleBar extends HBox {
     /**
      * @return the label
      */
-    public final Text getLabel() {
+    public final EditableLabel getLabel() {
         return label;
     }
 

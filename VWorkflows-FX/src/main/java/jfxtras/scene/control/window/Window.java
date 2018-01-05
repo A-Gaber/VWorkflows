@@ -74,7 +74,9 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
+import jfxtras.internal.scene.control.skin.window.DefaultWindowSkin;
 import jfxtras.internal.scene.control.skin.window.DefaultWindowSkinSimplified;
+import jfxtras.internal.scene.control.skin.window.EditableLabel;
 
 /**
  * Window control. A window control is a window node as known from Swing, e.g
@@ -133,6 +135,12 @@ public class Window extends Control implements SelectableNode {
      * generic position property?
      */
     private final ObservableList<WindowIcon> rightIcons = FXCollections.observableArrayList();
+
+    public ObservableList<EditableLabel> getEditableLabels() {
+        return editableLabels;
+    }
+
+    private final ObservableList<EditableLabel> editableLabels = FXCollections.observableArrayList();
     /**
      * Defines the width of the border /area where the user can grab the window
      * and resize it.
@@ -179,6 +187,8 @@ public class Window extends Control implements SelectableNode {
     private final BooleanProperty movingProperty = new SimpleBooleanProperty();
     private final BooleanProperty resizingProperty = new SimpleBooleanProperty();
 
+
+
     public Paint getSelectionBorderColor() {
         return selectionBorderColor == null ? new Color(0.3, 0.7, 1.0, 1.0) : selectionBorderColor.get();
     }
@@ -215,6 +225,7 @@ public class Window extends Control implements SelectableNode {
                     true);
         }
         return selectionEffectEnabled;
+
     }
 
     private static class StyleableProperties {
@@ -457,6 +468,7 @@ public class Window extends Control implements SelectableNode {
             }
         } // end for sN
     }
+
 
     public double minWidthWithTitle() {
         if (getSkin() instanceof DefaultWindowSkinSimplified) {

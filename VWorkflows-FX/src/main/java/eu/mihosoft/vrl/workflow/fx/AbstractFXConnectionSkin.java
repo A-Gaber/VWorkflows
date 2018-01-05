@@ -405,6 +405,16 @@ public abstract class AbstractFXConnectionSkin implements FXConnectionSkin {
         return list;
     }
 
+    public ArrayList<Circle> getBreakpoints(){
+        ArrayList<Circle> breakPoints = new ArrayList<>();
+        InteractiveCurve temp = interactiveCurve;
+        while (temp.getbNext()!=null){
+            breakPoints.add(temp.getbNext().getBreakPoint());
+            temp = temp.getbNext().getNext();
+        }
+        return breakPoints;
+    }
+
     @Override
     public void addPoints(ArrayList<javafx.util.Pair> pointsList){
         pointsList.forEach(pair -> {

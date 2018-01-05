@@ -389,6 +389,8 @@ public class DefaultFXConnectionSkin extends AbstractFXConnectionSkin {
         senderProperty.set(n);
     }
 
+
+
     @Override
     public final void setModel(Connection model) {
         modelProperty.set(model);

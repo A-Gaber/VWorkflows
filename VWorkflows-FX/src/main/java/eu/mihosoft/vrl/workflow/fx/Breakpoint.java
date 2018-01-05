@@ -30,6 +30,7 @@ public class Breakpoint {
         breakPoint.setRadius(15);
         breakPoint.setStroke(Color.YELLOW);
         breakPoint.setStrokeWidth(3);
+        breakPoint.setOpacity(0.3);
         MouseControlUtil.makeDraggable(breakPoint);
         id = UUID.randomUUID().toString();
         breakPoint.setOnMouseClicked(mouseEvent -> {

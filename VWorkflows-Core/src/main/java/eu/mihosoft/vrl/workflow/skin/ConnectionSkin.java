@@ -36,6 +36,7 @@ package eu.mihosoft.vrl.workflow.skin;
 import eu.mihosoft.vrl.workflow.Connection;
 import eu.mihosoft.vrl.workflow.Connector;
 import javafx.beans.property.ObjectProperty;
+import javafx.scene.shape.Circle;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
@@ -96,6 +97,7 @@ public interface ConnectionSkin<T extends Connection> extends Skin<Connection> {
     void receiverToFront();
 
     void addBreakpoint(double x,double y);
+    ArrayList<Circle> getBreakpoints();
 
     void addPoints(ArrayList<Pair> pointList);
 

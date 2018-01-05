@@ -938,6 +938,7 @@ public class FXFlowNodeSkin
             node.setTitle(newValue);
         };
 
+
         modelXListener = (ov, oldValue, newValue) -> {
             node.setLayoutX(newValue.doubleValue());
         };
