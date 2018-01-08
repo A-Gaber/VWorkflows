@@ -16,6 +16,7 @@ import java.util.UUID;
 public class InteractiveCurve{
 
 
+    private InteractiveCurve firstLine;
     private String id;
     private Parent parent;
     private Path path;
@@ -40,8 +41,48 @@ public class InteractiveCurve{
                 "vnode-connection");
 
         path.setOnMouseClicked(mouseEvent -> {
-            handleBreakpointAdd(mouseEvent.getX(),mouseEvent.getY());
+            if(mouseEvent.getClickCount() == 2) {
+                handleBreakpointAdd(mouseEvent.getX(),mouseEvent.getY());
+                handleVisualHigh(firstLine.bPref);
+                handleVisualHigh(firstLine.bNext);
+                return;
+            } else {
+                if((bNext != null && bNext.isVis()) || bPref !=null && bPref.isVis()){
+                    handleVisualLow(firstLine.bPref);
+                    handleVisualLow(firstLine.bNext);
+                } else {
+                    handleVisualHigh(firstLine.bPref);
+                    handleVisualHigh(firstLine.bNext);
+                }
+
+
+
+
+
+            }
+
+
         });
+    }
+
+
+
+    private void handleVisualHigh(Breakpoint br){
+        if(br == null) return;
+        br.getBreakPoint().setOpacity(0.8);
+        br.setVis(true);
+        if(br.getNext() != this) br.getNext().handleVisualHigh(br.getNext().bNext);
+        if(br.getPrev() != this) br.getPrev().handleVisualHigh(br.getPrev().bNext);
+
+    }
+
+    private void handleVisualLow(Breakpoint br){
+        if(br == null) return;
+        br.getBreakPoint().setOpacity(0.1);
+        br.setVis(false);
+        if(br.getNext() != this) br.getNext().handleVisualLow(br.getNext().bNext);
+        if(br.getPrev() != this) br.getPrev().handleVisualLow(br.getPrev().bNext);
+
     }
 
     private void handleBreakpointAdd(double x , double y){
@@ -53,6 +94,7 @@ public class InteractiveCurve{
 
 
         bNext.setNextCurve(temp,endXBinding,endYBinding);
+        bNext.getNext().setFirstLine(firstLine);
         bNext.setPrevCurve(this);
         if(temp!=null)temp.setPrevCurve(bNext.getNext());
 
@@ -142,5 +184,9 @@ public class InteractiveCurve{
     }
     public DoubleBinding getEndYBinding(){
         return endYBinding;
+    }
+
+    public void setFirstLine(InteractiveCurve i){
+        firstLine = i;
     }
 }

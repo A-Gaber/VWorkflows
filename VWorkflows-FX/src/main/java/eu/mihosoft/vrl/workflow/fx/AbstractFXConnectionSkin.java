@@ -64,6 +64,7 @@ public abstract class AbstractFXConnectionSkin implements FXConnectionSkin {
     // -- mutable fields
     protected Path connectionPath;
     protected InteractiveCurve interactiveCurve;
+    protected ArrayList<Circle> circleArrayList;
     protected Circle receiverConnectorUI;
     protected VFlow controller;
     protected ConnectorShape senderShape;
@@ -214,6 +215,7 @@ public abstract class AbstractFXConnectionSkin implements FXConnectionSkin {
         //LineTo curveTo = new LineTo();
 
         interactiveCurve = new InteractiveCurve(getParent());
+        interactiveCurve.setFirstLine(interactiveCurve);
 
         interactiveCurve.setStartYBinding(startYBinding);
         interactiveCurve.setStartXBinding(startXBinding);

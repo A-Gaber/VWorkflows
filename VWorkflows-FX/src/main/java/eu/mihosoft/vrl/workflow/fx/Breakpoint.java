@@ -19,6 +19,7 @@ public class Breakpoint {
     private Circle breakPoint = new Circle();
     private InteractiveCurve next;
     private InteractiveCurve prev;
+    private boolean isVis = true;
 
     public Breakpoint(Parent parent){
         this.parent = parent;
@@ -30,7 +31,7 @@ public class Breakpoint {
         breakPoint.setRadius(15);
         breakPoint.setStroke(Color.YELLOW);
         breakPoint.setStrokeWidth(3);
-        breakPoint.setOpacity(0.3);
+        breakPoint.setOpacity(0.8);
         MouseControlUtil.makeDraggable(breakPoint);
         id = UUID.randomUUID().toString();
         breakPoint.setOnMouseClicked(mouseEvent -> {
@@ -168,5 +169,13 @@ public class Breakpoint {
 
     public String getID(){
         return id;
+    }
+
+    public boolean isVis(){
+        return isVis;
+    }
+
+    public void setVis(boolean b){
+        isVis = b;
     }
 }
