@@ -33,6 +33,7 @@
  */
 package jfxtras.internal.scene.control.skin.window;
 
+import eu.mihosoft.vrl.workflow.fx.SelecCircle;
 import javafx.animation.Animation.Status;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -813,6 +814,11 @@ public class DefaultWindowSkin extends SkinBase<Window> {
         for (SelectableNode sN : WindowUtil.
                 getDefaultClipboard().getSelectedItems()) {
 
+            if(sN instanceof SelecCircle) {
+                SelecCircle c = (SelecCircle) sN;
+                c.setLayoutX(c.getLayoutX()+offsetForAllX);
+                c.setLayoutY(c.getLayoutY()+offsetForAllY);
+            }
             if (sN == control
                     || !(sN instanceof Window)) {
                 continue;

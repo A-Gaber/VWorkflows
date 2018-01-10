@@ -35,11 +35,14 @@ package jfxtras.labs.util.event;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import eu.mihosoft.vrl.workflow.fx.SelecCircle;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import jfxtras.scene.control.window.NodeUtil;
 import jfxtras.scene.control.window.SelectableNode;
@@ -371,12 +374,12 @@ class RectangleSelectionControllerImpl {
 
         this.root = root;
 
-//        root.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent t) {
-//                WindowUtil.getDefaultClipboard().unselectAll();
-//            }
-//        });
+        root.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) {
+                WindowUtil.getDefaultClipboard().deselectAll();
+            }
+        });
         mouseDraggedEventHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -457,6 +460,7 @@ class RectangleSelectionControllerImpl {
         boolean rectBigEnough = rectangle.getWidth() > 1 || rectangle.getHeight() > 1;
 
         for (Node n : selectableNodes) {
+
             boolean selectN = rectangle.intersects(
                     rectangle.parentToLocal(
                             n.localToParent(n.getBoundsInLocal())));
@@ -468,6 +472,8 @@ class RectangleSelectionControllerImpl {
                         sn, (selectN && rectBigEnough));
             }
         }
+
+
 
     }
 

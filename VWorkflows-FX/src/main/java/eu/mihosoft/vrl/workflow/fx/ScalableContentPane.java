@@ -33,6 +33,7 @@
  */
 package eu.mihosoft.vrl.workflow.fx;
 
+import com.sun.javafx.css.converters.ShapeConverter;
 import eu.mihosoft.scaledfx.ScaleBehavior;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -115,6 +116,8 @@ public class ScalableContentPane extends Region {
     public Property<Pane> contentProperty() {
         return this.contentPaneProperty;
     }
+
+
 
     public final Scale getContentScaleTransform() {
         return this.contentScaleTransform;

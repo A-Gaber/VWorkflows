@@ -16,7 +16,7 @@ public class Breakpoint {
 
     private Parent parent;
     private String id;
-    private Circle breakPoint = new Circle();
+    private SelecCircle breakPoint = new SelecCircle();
     private InteractiveCurve next;
     private InteractiveCurve prev;
     private boolean isVis = true;
