@@ -36,16 +36,17 @@ package jfxtras.labs.util.event;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.mihosoft.vrl.workflow.fx.SelecCircle;
+import eu.mihosoft.vrl.workflow.Selectable;
+import eu.mihosoft.vrl.workflow.fx.SelectableCircle;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import jfxtras.scene.control.window.NodeUtil;
 import jfxtras.scene.control.window.SelectableNode;
+import jfxtras.scene.control.window.Window;
 import jfxtras.scene.control.window.WindowUtil;
 
 /**
@@ -291,6 +292,8 @@ class DraggingControllerImpl {
         nodeX += offsetX;
         nodeY += offsetY;
 
+
+
         double scaledX;
         double scaledY;
 
@@ -298,10 +301,24 @@ class DraggingControllerImpl {
             Point2D p2d = n.getParent().sceneToLocal(mouseX, mouseY);
             scaledX = p2d.getX();
             scaledY = p2d.getY();
+            double offsetForAllX = scaledX - n.getLayoutX();
+            double offsetForAllY = scaledY - n.getLayoutY();
+            if (n instanceof SelectableNode &&((SelectableNode)n).isSelected()) {
+                dragSelectedWindows(((SelectableNode)n),offsetForAllX, offsetForAllY);
+            }
         } else {
             scaledX = nodeX * 1 / (parentScaleX);
             scaledY = nodeY * 1 / (parentScaleY);
+            double offsetForAllX = scaledX - n.getLayoutX();
+            double offsetForAllY = scaledY - n.getLayoutY();
+            if (n instanceof SelectableNode &&((SelectableNode)n).isSelected()) {
+                dragSelectedWindows(((SelectableNode)n),offsetForAllX, offsetForAllY);
+            }
         }
+
+
+
+
 
         n.setLayoutX(scaledX);
         n.setLayoutY(scaledY);
@@ -310,6 +327,35 @@ class DraggingControllerImpl {
         mouseX = event.getSceneX();
         mouseY = event.getSceneY();
 
+    }
+
+    private void dragSelectedWindows(SelectableNode control,double offsetForAllX, double offsetForAllY) {
+        for (SelectableNode sN : WindowUtil.
+                getDefaultClipboard().getSelectedItems()) {
+
+            if(sN instanceof SelectableCircle) {
+                SelectableCircle c = (SelectableCircle) sN;
+                c.setLayoutX(c.getLayoutX()+offsetForAllX);
+                c.setLayoutY(c.getLayoutY()+offsetForAllY);
+            }
+            if (sN == control
+                    || !(sN instanceof Window)) {
+                continue;
+            }
+
+            Window selectedWindow = (Window) sN;
+
+            if (((Node)control).getParent().
+                    equals(selectedWindow.getParent())) {
+
+                selectedWindow.setLayoutX(
+                        selectedWindow.getLayoutX()
+                                + offsetForAllX);
+                selectedWindow.setLayoutY(
+                        selectedWindow.getLayoutY()
+                                + offsetForAllY);
+            }
+        } // end for sN
     }
 
     public void performDragBegin(

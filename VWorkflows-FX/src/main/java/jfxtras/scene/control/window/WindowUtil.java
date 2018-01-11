@@ -36,7 +36,7 @@ package jfxtras.scene.control.window;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.mihosoft.vrl.workflow.fx.SelecCircle;
+import eu.mihosoft.vrl.workflow.fx.SelectableCircle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -88,8 +88,8 @@ class ClipboardImpl implements Clipboard {
             if (selected) {
                 if (!items.contains(n)) {
                     items.add(n);
-                    if(n instanceof SelecCircle) {
-                        SelecCircle s = (SelecCircle) n;
+                    if(n instanceof SelectableCircle) {
+                        SelectableCircle s = (SelectableCircle) n;
                         if(s.noSkin())s.skin();
                     }
                 }
@@ -116,8 +116,8 @@ class ClipboardImpl implements Clipboard {
         
         for (SelectableNode sN : unselectList) {
             select(sN, false);
-            if(sN instanceof SelecCircle) {
-                SelecCircle s = (SelecCircle) sN;
+            if(sN instanceof SelectableCircle) {
+                SelectableCircle s = (SelectableCircle) sN;
                 s.deSkin();
             }
         }

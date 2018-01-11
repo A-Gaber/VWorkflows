@@ -33,7 +33,7 @@
  */
 package jfxtras.internal.scene.control.skin.window;
 
-import eu.mihosoft.vrl.workflow.fx.SelecCircle;
+import eu.mihosoft.vrl.workflow.fx.SelectableCircle;
 import javafx.animation.Animation.Status;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -54,9 +54,7 @@ import javafx.scene.effect.ColorAdjust;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Text;
 import javafx.util.Duration;
-import jfxtras.labs.util.event.MouseControlUtil;
 import jfxtras.scene.control.window.SelectableNode;
 import jfxtras.scene.control.window.Window;
 import jfxtras.scene.control.window.WindowIcon;
@@ -95,10 +93,7 @@ public class DefaultWindowSkin extends SkinBase<Window> {
         titleBar = new TitleBar(control);
         titleBar.setTitle("");
         init();
-        titleBar.getLabel().baseTextProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("test name ");
 
-        });
     }
 
     private void init() {
@@ -814,8 +809,8 @@ public class DefaultWindowSkin extends SkinBase<Window> {
         for (SelectableNode sN : WindowUtil.
                 getDefaultClipboard().getSelectedItems()) {
 
-            if(sN instanceof SelecCircle) {
-                SelecCircle c = (SelecCircle) sN;
+            if(sN instanceof SelectableCircle) {
+                SelectableCircle c = (SelectableCircle) sN;
                 c.setLayoutX(c.getLayoutX()+offsetForAllX);
                 c.setLayoutY(c.getLayoutY()+offsetForAllY);
             }
@@ -915,7 +910,7 @@ class TitleBar extends HBox {
         getStylesheets().setAll(w.getStylesheets());
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
-        label.getUserAgentStylesheet();
+
 
 
         setSpacing(15);

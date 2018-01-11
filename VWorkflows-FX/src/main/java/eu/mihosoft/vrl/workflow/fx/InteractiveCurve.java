@@ -69,7 +69,7 @@ public class InteractiveCurve{
 
     private void handleVisualHigh(Breakpoint br){
         if(br == null) return;
-        br.getBreakPoint().setOpacity(0.8);
+        br.getBreakPoint().activate();
         br.setVis(true);
         if(br.getNext() != this) br.getNext().handleVisualHigh(br.getNext().bNext);
         if(br.getPrev() != this) br.getPrev().handleVisualHigh(br.getPrev().bNext);
@@ -78,7 +78,7 @@ public class InteractiveCurve{
 
     private void handleVisualLow(Breakpoint br){
         if(br == null) return;
-        br.getBreakPoint().setOpacity(0.1);
+        br.getBreakPoint().deActivate();
         br.setVis(false);
         if(br.getNext() != this) br.getNext().handleVisualLow(br.getNext().bNext);
         if(br.getPrev() != this) br.getPrev().handleVisualLow(br.getPrev().bNext);

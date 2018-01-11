@@ -7,6 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import jfxtras.labs.util.event.MouseControlUtil;
 
+import java.io.File;
 import java.util.UUID;
 
 /**
@@ -16,7 +17,7 @@ public class Breakpoint {
 
     private Parent parent;
     private String id;
-    private SelecCircle breakPoint = new SelecCircle();
+    private SelectableCircle breakPoint = new SelectableCircle();
     private InteractiveCurve next;
     private InteractiveCurve prev;
     private boolean isVis = true;
@@ -28,16 +29,11 @@ public class Breakpoint {
     }
 
     private void initBreakPoint(){
-        breakPoint.setRadius(15);
-        breakPoint.setStroke(Color.YELLOW);
-        breakPoint.setStrokeWidth(3);
-        breakPoint.setOpacity(0.8);
         MouseControlUtil.makeDraggable(breakPoint);
         id = UUID.randomUUID().toString();
         breakPoint.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton() == MouseButton.SECONDARY) {
                 handelDelete();
-
             }
 
         } );
@@ -163,7 +159,7 @@ public class Breakpoint {
         breakPoint.toFront();
     }
 
-    public Circle getBreakPoint() {
+    public SelectableCircle getBreakPoint() {
         return breakPoint;
     }
 

@@ -38,7 +38,10 @@ public class EditableLabel extends TextField {
 
     public EditableLabel(String text) {
         super(text);
-        getStyleClass().setAll("editable-label");
+        //getStyleClass().setAll("editable-label");
+        setId("editable-label");
+
+        applyCss();
         init();
     }
 
@@ -99,7 +102,8 @@ public class EditableLabel extends TextField {
 
     @Override
     public String getUserAgentStylesheet() {
-        URL pathToCSS = EditableLabel.class.getResource("default.css");
+
+        URL pathToCSS = EditableLabel.class.getResource("test.css");
         if ( pathToCSS != null ) {
             return pathToCSS.toExternalForm();
         } else {
