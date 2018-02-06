@@ -107,7 +107,7 @@ public class EditableLabel extends TextField {
         if ( pathToCSS != null ) {
             return pathToCSS.toExternalForm();
         } else {
-            System.err.println("CSS file for EditableLabel could not be found.");
+            //System.err.println("CSS file for EditableLabel could not be found.");
             return null;
         }
     }

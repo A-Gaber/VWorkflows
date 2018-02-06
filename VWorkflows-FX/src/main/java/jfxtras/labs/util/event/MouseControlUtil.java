@@ -42,6 +42,8 @@ import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Rectangle;
 import jfxtras.scene.control.window.NodeUtil;
@@ -430,7 +432,7 @@ class RectangleSelectionControllerImpl {
             @Override
             public void handle(MouseEvent event) {
 
-                if(event.isControlDown()) {
+                if(event.getButton() == MouseButton.PRIMARY) {
                     performDrag(root, event);
                     event.consume();
                 }
@@ -441,7 +443,7 @@ class RectangleSelectionControllerImpl {
             @Override
             public void handle(MouseEvent event) {
 
-                if(event.isControlDown()) {
+                if(event.getButton() == MouseButton.PRIMARY) {
                     performDragBegin(root, event);
                     event.consume();
                 }
@@ -451,7 +453,7 @@ class RectangleSelectionControllerImpl {
         mouseReleasedHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(event.isControlDown()) {
+                if(event.getButton() == MouseButton.PRIMARY) {
                     performDragEnd(root, event);
                     event.consume();
                 }

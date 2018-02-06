@@ -573,6 +573,8 @@ public class Window extends Control implements SelectableNode {
         return titleProperty.get();
     }
 
+
+
     /**
      * Defines the window title.
      *

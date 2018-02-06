@@ -188,6 +188,8 @@ public final class FlowNodeWindow extends Window {
 
     }
 
+
+
     private void initListenersAndBindings(final FXFlowNodeSkin skin) {
         addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent t) -> {
             connectorsToFront();

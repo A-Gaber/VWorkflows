@@ -21,6 +21,7 @@ public class Breakpoint {
     private InteractiveCurve next;
     private InteractiveCurve prev;
     private boolean isVis = true;
+    private boolean drag = false;
 
     public Breakpoint(Parent parent){
         this.parent = parent;
@@ -31,12 +32,22 @@ public class Breakpoint {
     private void initBreakPoint(){
         MouseControlUtil.makeDraggable(breakPoint);
         id = UUID.randomUUID().toString();
+        breakPoint.setOnDragDetected(mouseEvent -> {
+            drag = true;
+        });
         breakPoint.setOnMouseClicked(mouseEvent -> {
-            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                handelDelete();
+            if(!drag) {
+                if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                    handelDelete();
+                }
+                if (mouseEvent.getButton() == MouseButton.PRIMARY) {
+                    prev.triggerVisual();
+                }
             }
+            drag = false;
 
         } );
+
 
     }
 

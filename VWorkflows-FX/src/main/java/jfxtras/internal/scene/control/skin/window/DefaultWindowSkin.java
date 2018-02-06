@@ -49,6 +49,7 @@ import javafx.geometry.Pos;
 import javafx.scene.CacheHint;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.SkinBase;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.input.MouseEvent;
@@ -608,6 +609,9 @@ public class DefaultWindowSkin extends SkinBase<Window> {
 
             control.autosize();
         });
+        getSkinnable().onMouseEnteredProperty().set((MouseEvent t) -> {
+
+        });
     }
 
     /**
@@ -855,6 +859,10 @@ public class DefaultWindowSkin extends SkinBase<Window> {
         } // end for sN
     }
 
+    public TitleBar getTitleBar(){
+        return titleBar;
+    }
+
     static class MinimizeHeightListener implements ChangeListener<Number> {
 
         private final Window control;
@@ -899,6 +907,8 @@ class TitleBar extends HBox {
     private final double offset = 40;
     private double originalTitleWidth;
 
+    private HBox hbox;
+
     private float labelWidth;
 
     public TitleBar(Window w) {
@@ -928,6 +938,7 @@ class TitleBar extends HBox {
         r1.setMinWidth(15);
         this.setHgrow(r1,Priority.ALWAYS);
 
+        //getChildren().add(label);
         getChildren().add(label);
         label.setAlignment(Pos.CENTER);
         Region r2 = new Region();
@@ -938,6 +949,7 @@ class TitleBar extends HBox {
 
 //        getChildren().add(VFXLayoutUtil.createHBoxFiller());
         getChildren().add(rightIconPane);
+
 
 
         control.boundsInParentProperty().addListener(
@@ -963,6 +975,8 @@ class TitleBar extends HBox {
 //                        }
 //                    }
                 });
+
+
 
     }
 

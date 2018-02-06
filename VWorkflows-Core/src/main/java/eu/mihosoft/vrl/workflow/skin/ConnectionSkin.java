@@ -101,5 +101,8 @@ public interface ConnectionSkin<T extends Connection> extends Skin<Connection> {
 
     void addPoints(ArrayList<Pair> pointList);
 
+    void highlight(boolean s);
+    void triggerVisual(boolean s);
+
     ArrayList<Pair> getPoints();
 }

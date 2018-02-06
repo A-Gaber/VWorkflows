@@ -426,5 +426,12 @@ public abstract class AbstractFXConnectionSkin implements FXConnectionSkin {
 
     }
 
+    public void highlight(boolean s){
+        interactiveCurve.highlight(s);
+    }
+    public void triggerVisual(boolean s){
+        interactiveCurve.triggerVisual(s);
+    }
+
 
 }

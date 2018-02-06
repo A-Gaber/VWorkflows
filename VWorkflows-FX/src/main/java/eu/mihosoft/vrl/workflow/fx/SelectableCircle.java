@@ -21,7 +21,7 @@ public class SelectableCircle extends Circle implements SelectableNode {
     public SelectableCircle(){
         this.setRadius(10);
         //this.getStyleClass().add("SelectableCircle");
-        this.setId("normalBreakpoint");
+        this.setId("deactivatedBreakpoint");
         this.applyCss();
     }
 

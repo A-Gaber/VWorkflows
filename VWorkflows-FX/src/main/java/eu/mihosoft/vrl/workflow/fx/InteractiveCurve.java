@@ -3,6 +3,7 @@ package eu.mihosoft.vrl.workflow.fx;
 import javafx.beans.binding.DoubleBinding;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -37,8 +38,7 @@ public class InteractiveCurve{
         id = UUID.randomUUID().toString();
 
         path = new Path(moveTo,curveTo);
-        path.getStyleClass().setAll(
-                "vnode-connection");
+        path.getStyleClass().setAll("vnode-connection");
 
         path.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.getClickCount() == 2) {
@@ -47,14 +47,7 @@ public class InteractiveCurve{
                 handleVisualHigh(firstLine.bNext);
                 return;
             } else {
-                if((bNext != null && bNext.isVis()) || bPref !=null && bPref.isVis()){
-                    handleVisualLow(firstLine.bPref);
-                    handleVisualLow(firstLine.bNext);
-                } else {
-                    handleVisualHigh(firstLine.bPref);
-                    handleVisualHigh(firstLine.bNext);
-                }
-
+                triggerVisual();
 
 
 
@@ -63,6 +56,39 @@ public class InteractiveCurve{
 
 
         });
+
+    }
+
+    public void triggerVisual(){
+        if((bNext != null && bNext.isVis()) || bPref !=null && bPref.isVis()){
+            handleVisualLow(firstLine.bPref);
+            handleVisualLow(firstLine.bNext);
+        } else {
+            handleVisualHigh(firstLine.bPref);
+            handleVisualHigh(firstLine.bNext);
+        }
+    }
+
+    public void triggerVisual(boolean high){
+        if(high){
+            handleVisualHigh(firstLine.bPref);
+            handleVisualHigh(firstLine.bNext);
+        } else {
+            handleVisualLow(firstLine.bPref);
+            handleVisualLow(firstLine.bNext);
+        }
+
+    }
+
+    public void highlight(boolean highlight){
+        if(highlight) {
+            path.getStyleClass().setAll("vnode-connection-highlight");
+            path.applyCss();
+        } else {
+            path.getStyleClass().setAll("vnode-connection");
+            path.applyCss();
+        }
+        if(getbNext()!=null)getbNext().getNext().highlight(highlight);
     }
 
 
