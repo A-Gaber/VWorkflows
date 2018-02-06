@@ -23,6 +23,11 @@ public class SelectableCircle extends Circle implements SelectableNode {
         //this.getStyleClass().add("SelectableCircle");
         this.setId("deactivatedBreakpoint");
         this.applyCss();
+        selectedProperty.addListener((observableValue, aBoolean, t1) -> {
+            if(!observableValue.getValue().booleanValue()){
+                deSkin();
+            }
+        });
     }
 
 
