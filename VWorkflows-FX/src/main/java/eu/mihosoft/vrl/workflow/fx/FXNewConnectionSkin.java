@@ -38,13 +38,21 @@ import eu.mihosoft.vrl.workflow.Connector;
 import eu.mihosoft.vrl.workflow.VFlow;
 import eu.mihosoft.vrl.workflow.VFlowModel;
 import eu.mihosoft.vrl.workflow.VNode;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.CubicCurveTo;
+import jfxtras.labs.util.event.EventHandlerGroup;
 import jfxtras.labs.util.event.MouseControlUtil;
+import jfxtras.scene.control.window.SelectableNode;
+import jfxtras.scene.control.window.Window;
+import jfxtras.scene.control.window.WindowUtil;
+
+import java.util.ArrayList;
 /*
  * Copyright 2012-2016 Michael Hoffer <info@michaelhoffer.de>. All rights reserved.
  *
@@ -211,9 +219,9 @@ public class FXNewConnectionSkin extends AbstractFXConnectionSkin {
                 }
             }
         }, (MouseEvent event) -> {
-            receiverConnectorUI.layoutXProperty().unbind();
-            receiverConnectorUI.layoutYProperty().unbind();
-        }, true);
+        receiverConnectorUI.layoutXProperty().unbind();
+        receiverConnectorUI.layoutYProperty().unbind();
+    }, true);
 
         receiverConnectorUI.onMouseReleasedProperty().set(
                 (EventHandler<MouseEvent>) (MouseEvent t) -> {
@@ -280,4 +288,5 @@ public class FXNewConnectionSkin extends AbstractFXConnectionSkin {
         super.setController(flow);
         this.flow = flow.getModel();
     }
+
 }

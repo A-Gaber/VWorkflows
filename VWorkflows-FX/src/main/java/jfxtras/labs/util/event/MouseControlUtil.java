@@ -33,11 +33,14 @@
  */
 package jfxtras.labs.util.event;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.glass.ui.Robot;
 import eu.mihosoft.vrl.workflow.Selectable;
 import eu.mihosoft.vrl.workflow.fx.SelectableCircle;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -228,12 +231,13 @@ public class MouseControlUtil {
             final Node n,
             EventHandlerGroup<MouseEvent> dragHandler,
             EventHandlerGroup<MouseEvent> pressHandler, boolean centerNode) {
-
         DraggingControllerImpl draggingController
                 = new DraggingControllerImpl();
         draggingController.apply(n, dragHandler, pressHandler, centerNode);
     }
 }
+
+
 
 class DraggingControllerImpl {
 
@@ -318,9 +322,17 @@ class DraggingControllerImpl {
             }
         }
 
-
-
-
+//        if (scaledX % 1 >= 0.5) {
+//            n.setLayoutX(BigDecimal.valueOf(scaledX).setScale(0, BigDecimal.ROUND_DOWN).doubleValue() + 100);
+//        } else {
+//            n.setLayoutX(BigDecimal.valueOf(scaledX).setScale(0, BigDecimal.ROUND_DOWN).doubleValue() - 100);
+//        }
+//
+//        if (scaledY % 1 >= 0.5) {
+//            n.setLayoutY(BigDecimal.valueOf(scaledY).setScale(0, BigDecimal.ROUND_DOWN).doubleValue() + 100);
+//        } else {
+//            n.setLayoutY(BigDecimal.valueOf(scaledY).setScale(0, BigDecimal.ROUND_DOWN).doubleValue() - 100);
+//        }
 
         n.setLayoutX(scaledX);
         n.setLayoutY(scaledY);

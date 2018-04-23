@@ -1,13 +1,24 @@
 package eu.mihosoft.vrl.workflow.fx;
 
+import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Path;
+import jfxtras.labs.util.event.EventHandlerGroup;
 import jfxtras.labs.util.event.MouseControlUtil;
+import jfxtras.scene.control.window.SelectableNode;
+import jfxtras.scene.control.window.Window;
+import jfxtras.scene.control.window.WindowUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -23,14 +34,33 @@ public class Breakpoint {
     private boolean isVis = true;
     private boolean drag = false;
 
+    private EventHandlerGroup<MouseEvent> dragHandlerGroup;
+    private EventHandlerGroup<MouseEvent> pressHandlerGroup;
+
     public Breakpoint(Parent parent){
         this.parent = parent;
+        dragHandlerGroup = new EventHandlerGroup<>();
+        pressHandlerGroup = new EventHandlerGroup<>();
         initBreakPoint();
-
     }
 
     private void initBreakPoint(){
-        MouseControlUtil.makeDraggable(breakPoint);
+        // TODO DLW come up with a proper way to guide the drag w.r.t. the layout.
+//        dragHandlerGroup.addHandler();
+//        pressHandlerGroup.addHandler();
+
+        breakPoint.setOnMouseDragged(dragHandlerGroup);
+        breakPoint.setOnMousePressed(pressHandlerGroup);
+
+        breakPoint.layoutXProperty().unbind();
+        breakPoint.layoutYProperty().unbind();
+
+        GuidedDraggingControllerImpl draggingController = new GuidedDraggingControllerImpl();
+        draggingController.apply(breakPoint, dragHandlerGroup, pressHandlerGroup, true);
+        // TODO HARDCORE DLW HACKS!
+
+//        MouseControlUtil.makeDraggable(breakPoint, true);
+
         id = UUID.randomUUID().toString();
         breakPoint.setOnDragDetected(mouseEvent -> {
             drag = true;
@@ -185,4 +215,241 @@ public class Breakpoint {
     public void setVis(boolean b){
         isVis = b;
     }
+
+    // TODO DLW create a new DraggingControllerImpl clone
+    class GuidedDraggingControllerImpl {
+
+        private double nodeX;
+        private double nodeY;
+        private double mouseX;
+        private double mouseY;
+        private EventHandler<MouseEvent> mouseDraggedEventHandler;
+        private EventHandler<MouseEvent> mousePressedEventHandler;
+        private boolean centerNode = false;
+
+        public GuidedDraggingControllerImpl() {
+            //
+        }
+
+        public void apply(Node n, EventHandlerGroup<MouseEvent> draggedEvtHandler,
+                          EventHandlerGroup<MouseEvent> pressedEvtHandler,
+                          boolean centerNode) {
+            init(n);
+            draggedEvtHandler.addHandler(mouseDraggedEventHandler);
+            pressedEvtHandler.addHandler(mousePressedEventHandler);
+            this.centerNode = centerNode;
+        }
+
+        private void init(final Node n) {
+            mouseDraggedEventHandler = new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+
+                    performDrag(n, event);
+
+                    event.consume();
+                }
+            };
+
+            mousePressedEventHandler = new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+
+                    performDragBegin(n, event);
+                    event.consume();
+                }
+            };
+        }
+
+        public void performDrag(
+                Node n, MouseEvent event) {
+            final double parentScaleX = n.getParent().
+                    localToSceneTransformProperty().getValue().getMxx();
+            final double parentScaleY = n.getParent().
+                    localToSceneTransformProperty().getValue().getMyy();
+
+            // Get the exact moved X and Y
+            double offsetX = event.getSceneX() - mouseX;
+            double offsetY = event.getSceneY() - mouseY;
+
+            nodeX += offsetX;
+            nodeY += offsetY;
+
+
+            double scaledX;
+            double scaledY;
+
+            // TODO Do NOT consider selected break points!
+            //
+            // 1) find node(s) from relatedNodes closest to n w.r.t. x and y.
+            // However, x and y can be independent in terms of nodes.
+            // Only consider dx and dy that are within a specific sigma.
+            //
+            // 2) find out when centerNode is used...
+            //
+            // 3) when x and y are found, snap n accordingly.
+            //
+
+            // TODO now get shapes in the scene
+            Node closestXNode = null;
+            Node closestYNode = null;
+
+            if (centerNode) {
+                Point2D p2d = n.getParent().sceneToLocal(mouseX, mouseY);
+                scaledX = p2d.getX();
+                scaledY = p2d.getY();
+                double offsetForAllX = scaledX - n.getLayoutX();
+                double offsetForAllY = scaledY - n.getLayoutY();
+
+                double sigma = 5; // TODO ?
+
+                for (Node refNode : parent.getChildrenUnmodifiable()) {
+                    if (refNode instanceof FlowNodeWindow && refNode instanceof Path) {
+                        continue;
+                    }
+
+                    // avoid myself
+                    if (refNode == n) {
+                        continue;
+                    }
+
+                    double tmpX = Math.abs(scaledX - refNode.getLayoutX());
+                    if (tmpX < sigma) {
+                        if (closestXNode == null) {
+                            closestXNode = refNode;
+                        } else if (tmpX < closestXNode.getLayoutX()) {
+                            closestXNode = refNode;
+                        }
+                    }
+                    double tmpY = Math.abs(scaledY - refNode.getLayoutY());
+                    if (tmpY < sigma) {
+                        if (closestYNode == null) {
+                            closestYNode = refNode;
+                        } else if (tmpY < closestYNode.getLayoutY()) {
+                            closestYNode = refNode;
+                        }
+                    }
+
+                }
+
+                // TODO either let sigma break out by this or my distance to relatedNodes?
+                if (n instanceof SelectableNode &&((SelectableNode)n).isSelected()) {
+                    dragSelectedWindows(((SelectableNode)n),offsetForAllX, offsetForAllY);
+                }
+            } else {
+                scaledX = nodeX * 1 / (parentScaleX);
+                scaledY = nodeY * 1 / (parentScaleY);
+                double offsetForAllX = scaledX - n.getLayoutX();
+                double offsetForAllY = scaledY - n.getLayoutY();
+                if (n instanceof SelectableNode &&((SelectableNode)n).isSelected()) {
+                    dragSelectedWindows(((SelectableNode)n),offsetForAllX, offsetForAllY);
+                }
+            }
+
+            if (closestXNode != null) {
+//                System.out.println("closestXNode " + closestXNode.getLayoutX() + " ("+ closestXNode.getLayoutY() + ")");
+                n.setLayoutX(closestXNode.getLayoutX());
+            } else {
+//                System.out.println("X no snap!");
+                n.setLayoutX(scaledX);
+            }
+
+            if (closestYNode != null) {
+//                System.out.println("closestYNode (" + closestYNode.getLayoutX() + ") "+ closestYNode.getLayoutY() + "");
+                n.setLayoutY(closestYNode.getLayoutY());
+            } else {
+//                System.out.println("Y no snap!");
+                n.setLayoutY(scaledY);
+            }
+
+//            if (closestXNode !=null || closestYNode != null) {
+//                Platform.runLater(() -> {
+//                    try {
+//                        Point2D bTmp = n.getParent().localToScene(n.getLayoutX(), n.getLayoutY());
+//                        java.awt.Robot robot = new java.awt.Robot();
+//                        robot.mouseMove((int) bTmp.getX(), (int) bTmp.getY());
+//                    } catch (java.awt.AWTException e) {
+//                        e.printStackTrace();
+//                    }
+//                });
+//            }
+
+            // again set current Mouse x AND y position
+            mouseX = event.getSceneX();
+            mouseY = event.getSceneY();
+        }
+
+//        // Not sure if we need this?!
+//        private ArrayList<Breakpoint> getAllInteractiveCurveParts() {
+//            ArrayList<Breakpoint> ret = new ArrayList<Breakpoint>();
+//
+//            InteractiveCurve temp = getPrev();
+//            while (temp != null && temp.getbPrev() != null) {
+//                ret.add(temp.getbPrev());
+//                temp = temp.getbPrev().getPrev();
+//            }
+//
+//            temp = getNext();
+//            while (temp != null && temp.getbNext() != null) {
+//                ret.add(temp.getbNext());
+//                temp = temp.getbNext().getNext();
+//            }
+//            return ret;
+//        }
+
+        private void dragSelectedWindows(SelectableNode control,double offsetForAllX, double offsetForAllY) {
+            for (SelectableNode sN : WindowUtil.
+                    getDefaultClipboard().getSelectedItems()) {
+
+                if(sN instanceof SelectableCircle) {
+                    SelectableCircle c = (SelectableCircle) sN;
+                    c.setLayoutX(c.getLayoutX()+offsetForAllX);
+                    c.setLayoutY(c.getLayoutY()+offsetForAllY);
+                }
+                if (sN == control
+                        || !(sN instanceof Window)) {
+                    continue;
+                }
+
+                Window selectedWindow = (Window) sN;
+
+                if (((Node)control).getParent().
+                        equals(selectedWindow.getParent())) {
+
+                    selectedWindow.setLayoutX(
+                            selectedWindow.getLayoutX()
+                                    + offsetForAllX);
+                    selectedWindow.setLayoutY(
+                            selectedWindow.getLayoutY()
+                                    + offsetForAllY);
+                }
+            } // end for sN
+        }
+
+        public void performDragBegin(
+                Node n, MouseEvent event) {
+
+            final double parentScaleX = n.getParent().
+                    localToSceneTransformProperty().getValue().getMxx();
+            final double parentScaleY = n.getParent().
+                    localToSceneTransformProperty().getValue().getMyy();
+
+            // record the current mouse X and Y position on Node
+            mouseX = event.getSceneX();
+            mouseY = event.getSceneY();
+
+            if (centerNode) {
+                Point2D p2d = n.getParent().sceneToLocal(mouseX, mouseY);
+                nodeX = p2d.getX();
+                nodeY = p2d.getY();
+            } else {
+                nodeX = n.getLayoutX() * parentScaleX;
+                nodeY = n.getLayoutY() * parentScaleY;
+            }
+
+            n.toFront();
+        }
+
+    }
+
 }

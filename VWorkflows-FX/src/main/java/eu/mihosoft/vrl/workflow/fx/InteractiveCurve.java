@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * Created by jseidelmann on 09.08.17.
  */
-public class InteractiveCurve{
+public class InteractiveCurve {
 
 
     private InteractiveCurve firstLine;
@@ -118,7 +118,7 @@ public class InteractiveCurve{
         bNext.setX(x);
         bNext.setY(y);
 
-
+        // TODO shouldn't we check if temp is null?
         bNext.setNextCurve(temp,endXBinding,endYBinding);
         bNext.getNext().setFirstLine(firstLine);
         bNext.setPrevCurve(this);
@@ -199,6 +199,10 @@ public class InteractiveCurve{
 
     public Breakpoint getbNext() {
         return bNext;
+    }
+
+    public Breakpoint getbPrev() {
+        return bPref;
     }
 
     public String getId() {
