@@ -10,6 +10,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import jfxtras.labs.util.event.EventHandlerGroup;
 import jfxtras.labs.util.event.MouseControlUtil;
@@ -22,7 +23,8 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 /**
- * Created by jseidelmann on 10.08.17.
+ * Created  by jseidelmann on 10.08.2017.
+ * Modified by dwigand    on 23.04.2018.
  */
 public class Breakpoint {
 
@@ -34,13 +36,17 @@ public class Breakpoint {
     private boolean isVis = true;
     private boolean drag = false;
 
+    private double snappingSigma = 10;
+
     private EventHandlerGroup<MouseEvent> dragHandlerGroup;
     private EventHandlerGroup<MouseEvent> pressHandlerGroup;
+    private EventHandlerGroup<MouseEvent> pressReleaseHandlerGroup;
 
     public Breakpoint(Parent parent){
         this.parent = parent;
         dragHandlerGroup = new EventHandlerGroup<>();
         pressHandlerGroup = new EventHandlerGroup<>();
+        pressReleaseHandlerGroup = new EventHandlerGroup<>();
         initBreakPoint();
     }
 
@@ -51,20 +57,20 @@ public class Breakpoint {
 
         breakPoint.setOnMouseDragged(dragHandlerGroup);
         breakPoint.setOnMousePressed(pressHandlerGroup);
+        breakPoint.setOnMouseReleased(pressReleaseHandlerGroup);
 
         breakPoint.layoutXProperty().unbind();
         breakPoint.layoutYProperty().unbind();
 
         GuidedDraggingControllerImpl draggingController = new GuidedDraggingControllerImpl();
-        draggingController.apply(breakPoint, dragHandlerGroup, pressHandlerGroup, true);
-        // TODO HARDCORE DLW HACKS!
-
-//        MouseControlUtil.makeDraggable(breakPoint, true);
+        draggingController.apply(breakPoint, dragHandlerGroup, pressHandlerGroup, pressReleaseHandlerGroup, true);
 
         id = UUID.randomUUID().toString();
+
         breakPoint.setOnDragDetected(mouseEvent -> {
             drag = true;
         });
+
         breakPoint.setOnMouseClicked(mouseEvent -> {
             if(!drag) {
                 if (mouseEvent.getButton() == MouseButton.SECONDARY) {
@@ -75,10 +81,7 @@ public class Breakpoint {
                 }
             }
             drag = false;
-
         } );
-
-
     }
 
     private void handelDelete() {
@@ -225,18 +228,25 @@ public class Breakpoint {
         private double mouseY;
         private EventHandler<MouseEvent> mouseDraggedEventHandler;
         private EventHandler<MouseEvent> mousePressedEventHandler;
+        private EventHandler<MouseEvent> mouseReleasedEventHandler;
         private boolean centerNode = false;
 
+        private Line snapLineX = null;
+        private Line snapLineY = null;
+
         public GuidedDraggingControllerImpl() {
-            //
+            snapLineX = new Line();
+            snapLineY = new Line();
         }
 
         public void apply(Node n, EventHandlerGroup<MouseEvent> draggedEvtHandler,
                           EventHandlerGroup<MouseEvent> pressedEvtHandler,
+                          EventHandlerGroup<MouseEvent> pressReleasedEvtHandler,
                           boolean centerNode) {
             init(n);
             draggedEvtHandler.addHandler(mouseDraggedEventHandler);
             pressedEvtHandler.addHandler(mousePressedEventHandler);
+            pressReleasedEvtHandler.addHandler(mouseReleasedEventHandler);
             this.centerNode = centerNode;
         }
 
@@ -244,9 +254,7 @@ public class Breakpoint {
             mouseDraggedEventHandler = new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-
                     performDrag(n, event);
-
                     event.consume();
                 }
             };
@@ -254,8 +262,20 @@ public class Breakpoint {
             mousePressedEventHandler = new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-
                     performDragBegin(n, event);
+                    event.consume();
+                }
+            };
+
+            mouseReleasedEventHandler = new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+                    if (snapLineX != null && parent.getChildrenUnmodifiable().contains(snapLineX)) {
+                        NodeUtil.removeFromParent(snapLineX);
+                    }
+                    if (snapLineY != null && parent.getChildrenUnmodifiable().contains(snapLineY)) {
+                        NodeUtil.removeFromParent(snapLineY);
+                    }
                     event.consume();
                 }
             };
@@ -301,8 +321,6 @@ public class Breakpoint {
                 double offsetForAllX = scaledX - n.getLayoutX();
                 double offsetForAllY = scaledY - n.getLayoutY();
 
-                double sigma = 5; // TODO ?
-
                 for (Node refNode : parent.getChildrenUnmodifiable()) {
                     if (refNode instanceof FlowNodeWindow && refNode instanceof Path) {
                         continue;
@@ -314,7 +332,7 @@ public class Breakpoint {
                     }
 
                     double tmpX = Math.abs(scaledX - refNode.getLayoutX());
-                    if (tmpX < sigma) {
+                    if (tmpX < snappingSigma) {
                         if (closestXNode == null) {
                             closestXNode = refNode;
                         } else if (tmpX < closestXNode.getLayoutX()) {
@@ -322,7 +340,7 @@ public class Breakpoint {
                         }
                     }
                     double tmpY = Math.abs(scaledY - refNode.getLayoutY());
-                    if (tmpY < sigma) {
+                    if (tmpY < snappingSigma) {
                         if (closestYNode == null) {
                             closestYNode = refNode;
                         } else if (tmpY < closestYNode.getLayoutY()) {
@@ -348,17 +366,46 @@ public class Breakpoint {
 
             if (closestXNode != null) {
 //                System.out.println("closestXNode " + closestXNode.getLayoutX() + " ("+ closestXNode.getLayoutY() + ")");
+                snapLineX.setStartX(closestXNode.getLayoutX());
+                snapLineX.setEndX(closestXNode.getLayoutX());
+
+                snapLineX.setStartY(n.getBoundsInParent().getMinY() - 20);
+                snapLineX.setEndY(n.getBoundsInParent().getMaxY() + 20);
+
                 n.setLayoutX(closestXNode.getLayoutX());
+
+                if (!parent.getChildrenUnmodifiable().contains(snapLineX)) {
+                    NodeUtil.addToParent(parent, snapLineX);
+                }
+                snapLineX.toFront();
             } else {
 //                System.out.println("X no snap!");
+                if (parent.getChildrenUnmodifiable().contains(snapLineX)) {
+                    NodeUtil.removeFromParent(snapLineX);
+                }
+
                 n.setLayoutX(scaledX);
             }
 
             if (closestYNode != null) {
 //                System.out.println("closestYNode (" + closestYNode.getLayoutX() + ") "+ closestYNode.getLayoutY() + "");
+                snapLineY.setStartY(closestYNode.getLayoutY());
+                snapLineY.setEndY(closestYNode.getLayoutY());
+
+                snapLineY.setStartX(n.getBoundsInParent().getMinX() - 20);
+                snapLineY.setEndX(n.getBoundsInParent().getMaxX() + 20);
+
                 n.setLayoutY(closestYNode.getLayoutY());
+
+                if (!parent.getChildrenUnmodifiable().contains(snapLineY)) {
+                    NodeUtil.addToParent(parent, snapLineY);
+                }
+                snapLineY.toFront();
             } else {
 //                System.out.println("Y no snap!");
+                if (parent.getChildrenUnmodifiable().contains(snapLineY)) {
+                    NodeUtil.removeFromParent(snapLineY);
+                }
                 n.setLayoutY(scaledY);
             }
 
