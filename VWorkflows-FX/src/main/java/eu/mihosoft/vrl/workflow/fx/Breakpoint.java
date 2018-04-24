@@ -1,6 +1,5 @@
 package eu.mihosoft.vrl.workflow.fx;
 
-import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -8,18 +7,13 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Path;
 import jfxtras.labs.util.event.EventHandlerGroup;
-import jfxtras.labs.util.event.MouseControlUtil;
 import jfxtras.scene.control.window.SelectableNode;
 import jfxtras.scene.control.window.Window;
 import jfxtras.scene.control.window.WindowUtil;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -36,7 +30,8 @@ public class Breakpoint {
     private boolean isVis = true;
     private boolean drag = false;
 
-    private double snappingSigma = 10;
+    private double snapSigma = 10;
+    private double snapLineLength = 20;
 
     private EventHandlerGroup<MouseEvent> dragHandlerGroup;
     private EventHandlerGroup<MouseEvent> pressHandlerGroup;
@@ -236,7 +231,9 @@ public class Breakpoint {
 
         public GuidedDraggingControllerImpl() {
             snapLineX = new Line();
+            snapLineX.getStyleClass().setAll("snap-line");
             snapLineY = new Line();
+            snapLineY.getStyleClass().setAll("snap-line");
         }
 
         public void apply(Node n, EventHandlerGroup<MouseEvent> draggedEvtHandler,
@@ -262,6 +259,10 @@ public class Breakpoint {
             mousePressedEventHandler = new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
+                    // Load Properties for appearances
+                    snapSigma = PropertiesManager.getInstance().getSnapSigma();
+                    snapLineLength = PropertiesManager.getInstance().getSnapLineLength();
+
                     performDragBegin(n, event);
                     event.consume();
                 }
@@ -295,22 +296,9 @@ public class Breakpoint {
             nodeX += offsetX;
             nodeY += offsetY;
 
-
             double scaledX;
             double scaledY;
 
-            // TODO Do NOT consider selected break points!
-            //
-            // 1) find node(s) from relatedNodes closest to n w.r.t. x and y.
-            // However, x and y can be independent in terms of nodes.
-            // Only consider dx and dy that are within a specific sigma.
-            //
-            // 2) find out when centerNode is used...
-            //
-            // 3) when x and y are found, snap n accordingly.
-            //
-
-            // TODO now get shapes in the scene
             Node closestXNode = null;
             Node closestYNode = null;
 
@@ -332,7 +320,7 @@ public class Breakpoint {
                     }
 
                     double tmpX = Math.abs(scaledX - refNode.getLayoutX());
-                    if (tmpX < snappingSigma) {
+                    if (tmpX < snapSigma) {
                         if (closestXNode == null) {
                             closestXNode = refNode;
                         } else if (tmpX < closestXNode.getLayoutX()) {
@@ -340,7 +328,7 @@ public class Breakpoint {
                         }
                     }
                     double tmpY = Math.abs(scaledY - refNode.getLayoutY());
-                    if (tmpY < snappingSigma) {
+                    if (tmpY < snapSigma) {
                         if (closestYNode == null) {
                             closestYNode = refNode;
                         } else if (tmpY < closestYNode.getLayoutY()) {
@@ -369,8 +357,8 @@ public class Breakpoint {
                 snapLineX.setStartX(closestXNode.getLayoutX());
                 snapLineX.setEndX(closestXNode.getLayoutX());
 
-                snapLineX.setStartY(n.getBoundsInParent().getMinY() - 20);
-                snapLineX.setEndY(n.getBoundsInParent().getMaxY() + 20);
+                snapLineX.setStartY(n.getBoundsInParent().getMinY() - snapLineLength);
+                snapLineX.setEndY(n.getBoundsInParent().getMaxY() + snapLineLength);
 
                 n.setLayoutX(closestXNode.getLayoutX());
 
@@ -392,8 +380,8 @@ public class Breakpoint {
                 snapLineY.setStartY(closestYNode.getLayoutY());
                 snapLineY.setEndY(closestYNode.getLayoutY());
 
-                snapLineY.setStartX(n.getBoundsInParent().getMinX() - 20);
-                snapLineY.setEndX(n.getBoundsInParent().getMaxX() + 20);
+                snapLineY.setStartX(n.getBoundsInParent().getMinX() - snapLineLength);
+                snapLineY.setEndX(n.getBoundsInParent().getMaxX() + snapLineLength);
 
                 n.setLayoutY(closestYNode.getLayoutY());
 
@@ -426,7 +414,6 @@ public class Breakpoint {
             mouseY = event.getSceneY();
         }
 
-//        // Not sure if we need this?!
 //        private ArrayList<Breakpoint> getAllInteractiveCurveParts() {
 //            ArrayList<Breakpoint> ret = new ArrayList<Breakpoint>();
 //
