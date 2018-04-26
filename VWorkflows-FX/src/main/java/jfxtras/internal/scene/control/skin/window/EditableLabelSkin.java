@@ -90,7 +90,7 @@ public class EditableLabelSkin extends TextFieldSkin {
      */
     private String calculateClipString(String text) {
         double labelWidth = editableLabel.getWidth();
-
+        //TODO DLW fix this!
         Text layoutText = new Text(text);
         layoutText.setFont(editableLabel.getFont());
 
@@ -98,7 +98,7 @@ public class EditableLabelSkin extends TextFieldSkin {
             return text;
         } else {
             layoutText.setText(text+"...");
-            while ( layoutText.getLayoutBounds().getWidth() > labelWidth ) {
+            while (layoutText.getLayoutBounds().getWidth() > labelWidth) {
                 text = text.substring(0, text.length()-1);
                 layoutText.setText(text+"...");
             }

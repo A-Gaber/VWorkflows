@@ -93,7 +93,7 @@ public final class FlowNodeWindow extends Window {
     private VCanvas content;
     private Pane inputContainer;
     private Pane outputContainer;
-    private EditableLabel e;
+    private EditableLabel editableLabelForTitle;
     private OptimizableContentPane parentContent;
     private final CloseIcon closeIcon = new CloseIcon(this);
     private final MinimizeIcon minimizeIcon = new MinimizeIcon(this);
@@ -150,6 +150,7 @@ public final class FlowNodeWindow extends Window {
     }
 
     private void initUI(final FXFlowNodeSkin skin) {
+        final ContextMenu cm = new ContextMenu();
         // only register content if this window visualizes a flow
         if (skin.getModel() instanceof VFlowModel) {
 
@@ -165,7 +166,13 @@ public final class FlowNodeWindow extends Window {
 
             HBox.setHgrow(content, Priority.SOMETIMES);
 
-            addResetViewMenu(content);
+//            addResetViewMenu(content);
+            MenuItem resetViewItem = new MenuItem("Reset View");
+            resetViewItem.setOnAction((ActionEvent e) -> {
+                content.resetTranslation();
+                content.resetScale();
+            });
+            cm.getItems().add(resetViewItem);
 
             inputContainer = new VBox();
             outputContainer = new VBox();
@@ -178,22 +185,35 @@ public final class FlowNodeWindow extends Window {
                 content.resetScale();
                 content.resetTranslation();
             };
+        } else {
+//            MenuItem resetViewItem = new MenuItem("To Front");
+//            resetViewItem.setOnAction((ActionEvent e) -> {
+//                toFront();
+//            });
+//            cm.getItems().add(resetViewItem);
         }
 
-        // 
-        addCollapseIcon(skin);
+        this.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
+            if (e.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
+                cm.show(this, e.getScreenX(), e.getScreenY());
+            }
+        });
+
+        // DLW Remove the 2 strange icons
+//        addCollapseIcon(skin);
         configureCanvas(skin);
-        e = new EditableLabel();
-        getEditableLabels().add(e);
+        editableLabelForTitle = new EditableLabel();
+        getEditableLabels().add(editableLabelForTitle);
 
     }
 
 
 
     private void initListenersAndBindings(final FXFlowNodeSkin skin) {
-        addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent t) -> {
-            connectorsToFront();
-        });
+        // TODO perhaps allow this behavior, if SHIFT is pressed?
+//        addEventHandler(MouseEvent.MOUSE_ENTERED, (MouseEvent t) -> {
+//            connectorsToFront();
+//        });
 
         setSelectable(skin.getModel().isSelectable());
         skin.getModel().selectableProperty().bindBidirectional(this.selectableProperty());
@@ -211,6 +231,7 @@ public final class FlowNodeWindow extends Window {
             skin.getModel().requestSelection(newValue);
         });
 
+        // TODO DLW disable select on click?
         skinProperty().addListener((ov, oldValue, newValue) -> {
             if (newValue != null) {
                 Node titlebar = newValue.getNode().lookup("." + getTitleBarStyleClass());
@@ -218,7 +239,8 @@ public final class FlowNodeWindow extends Window {
                 titlebar.addEventHandler(MouseEvent.ANY, (MouseEvent evt) -> {
                     if (evt.getClickCount() == 1
                             && evt.getEventType() == MouseEvent.MOUSE_RELEASED
-                            && evt.isDragDetect()) {
+                            && evt.isDragDetect()
+                            && evt.isControlDown()) {
                         skin.getModel().requestSelection(!skin.getModel().isSelected());
                     }
                 });
@@ -470,8 +492,8 @@ public final class FlowNodeWindow extends Window {
     }
 
     final void setEditableState(boolean b) {
-        setCloseableState(b);
-        setMinimizableState(b);
+//        setCloseableState(b);
+//        setMinimizableState(b);
 //        setSelectable(b);
     }
 

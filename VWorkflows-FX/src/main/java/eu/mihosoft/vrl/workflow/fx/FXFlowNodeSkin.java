@@ -164,6 +164,7 @@ public class FXFlowNodeSkin
         }
 
         node = createNodeWindow();
+        node.setEditableState(true);
 
         registerListeners(getModel());
 

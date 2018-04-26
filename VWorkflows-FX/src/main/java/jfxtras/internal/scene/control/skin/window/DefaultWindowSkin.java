@@ -44,6 +44,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ListChangeListener.Change;
+import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.CacheHint;
@@ -54,12 +55,11 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
-import jfxtras.scene.control.window.SelectableNode;
-import jfxtras.scene.control.window.Window;
-import jfxtras.scene.control.window.WindowIcon;
-import jfxtras.scene.control.window.WindowUtil;
+import jfxtras.scene.control.window.*;
 
 /**
  *
@@ -898,7 +898,6 @@ class TitleBar extends HBox {
     public static final String DEFAULT_STYLE_CLASS = "window-titlebar";
     private final Pane leftIconPane;
     private final Pane rightIconPane;
-//    private final Text label = new Text();
     private final EditableLabel label = new EditableLabel();
     private final double iconSpacing = 3;
     Window control;
@@ -920,37 +919,34 @@ class TitleBar extends HBox {
         getStylesheets().setAll(w.getStylesheets());
         getStyleClass().setAll(DEFAULT_STYLE_CLASS);
 
-
-
-
         setSpacing(15);
 
-
-//        label.setTextAlignment(TextAlignment.CENTER);
-//        label.getStyleClass().setAll(DEFAULT_STYLE_CLASS);
         leftIconPane = new IconPane();
         rightIconPane = new IconPane();
 
         getChildren().add(leftIconPane);
-//        getChildren().add(VFXLayoutUtil.createHBoxFiller());
+
         Region r1 = new Region();
         getChildren().add(r1);
         r1.setMinWidth(15);
+        r1.toBack();
+//        r1.setStyle("-fx-background-color: rgba(0,100,0,1.0);");
         this.setHgrow(r1,Priority.ALWAYS);
 
-        //getChildren().add(label);
+        leftIconPane.toFront();
+
         getChildren().add(label);
         label.setAlignment(Pos.CENTER);
+
         Region r2 = new Region();
         r2.setMinWidth(15);
+        r2.toBack();
+//        r2.setStyle("-fx-background-color: rgba(0,100,100,1.0);");
         getChildren().add(r2);
         this.setHgrow(r2,Priority.ALWAYS);
 
-
-//        getChildren().add(VFXLayoutUtil.createHBoxFiller());
         getChildren().add(rightIconPane);
-
-
+        rightIconPane.toFront();
 
         control.boundsInParentProperty().addListener(
                 (ObservableValue<? extends Bounds> ov, Bounds t, Bounds t1) -> {
@@ -960,9 +956,7 @@ class TitleBar extends HBox {
                         return;
                     }
 
-                    double maxIconWidth = Math.max(
-                            leftIconPane.getWidth(), rightIconPane.getWidth());
-
+//                    double maxIconWidth = Math.max(leftIconPane.getWidth(), rightIconPane.getWidth());
 //                    if (!control.getTitle().equals(getLabel().getText())) {
 //                        if (originalTitleWidth
 //                        + maxIconWidth * 2 + offset < getWidth()) {
@@ -975,9 +969,6 @@ class TitleBar extends HBox {
 //                        }
 //                    }
                 });
-
-
-
     }
 
     public void setTitle(String title) {
@@ -985,21 +976,14 @@ class TitleBar extends HBox {
 
         originalTitleWidth = getLabel().getBoundsInParent().getWidth();
 
-        double maxIconWidth = Math.max(
-                leftIconPane.getWidth(), rightIconPane.getWidth());
-
-        if (originalTitleWidth
-                + maxIconWidth * 2 + offset >= getWidth()) {
-            getLabel().setText("...");
-        }
+// TODO do NOT do this, because this screws up the name...
+//        double maxIconWidth = Math.max(leftIconPane.getWidth(), rightIconPane.getWidth());
+//        if (originalTitleWidth + maxIconWidth * 2 + offset >= getWidth()) {
+//            getLabel().setText("...");
+//        }
 
         // TODO replace with official API
-        labelWidth = com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().
-                computeStringWidth(title, label.getFont());
-
-
-
-
+        labelWidth = com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(title, label.getFont());
 
         requestLayout();
         requestParentLayout();
@@ -1011,12 +995,14 @@ class TitleBar extends HBox {
 
     public void addLeftIcon(Node n) {
         leftIconPane.getChildren().add(n);
+        n.toFront();
         requestLayout();
         requestParentLayout();
     }
 
     public void addRightIcon(Node n) {
         rightIconPane.getChildren().add(n);
+        n.toFront();
         requestLayout();
         requestParentLayout();
     }

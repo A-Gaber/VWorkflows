@@ -310,7 +310,8 @@ public class Breakpoint {
                 double offsetForAllY = scaledY - n.getLayoutY();
 
                 for (Node refNode : parent.getChildrenUnmodifiable()) {
-                    if (refNode instanceof FlowNodeWindow && refNode instanceof Path) {
+                    System.out.println("NODE: " + refNode);
+                    if (refNode instanceof FlowNodeWindow && refNode instanceof Path && refNode instanceof Line) {
                         continue;
                     }
 
@@ -338,18 +339,19 @@ public class Breakpoint {
 
                 }
 
-                // TODO either let sigma break out by this or my distance to relatedNodes?
-                if (n instanceof SelectableNode &&((SelectableNode)n).isSelected()) {
-                    dragSelectedWindows(((SelectableNode)n),offsetForAllX, offsetForAllY);
-                }
+//                // TODO fix this strange issue to move multiple selected ones... DISABLE for now!
+//                if (n instanceof SelectableNode &&((SelectableNode)n).isSelected()) {
+//                    dragSelectedWindows(((SelectableNode)n),offsetForAllX, offsetForAllY);
+//                }
             } else {
+                // NOT USED IN THIS CASE!
                 scaledX = nodeX * 1 / (parentScaleX);
                 scaledY = nodeY * 1 / (parentScaleY);
                 double offsetForAllX = scaledX - n.getLayoutX();
                 double offsetForAllY = scaledY - n.getLayoutY();
-                if (n instanceof SelectableNode &&((SelectableNode)n).isSelected()) {
-                    dragSelectedWindows(((SelectableNode)n),offsetForAllX, offsetForAllY);
-                }
+//                if (n instanceof SelectableNode &&((SelectableNode)n).isSelected()) {
+//                    dragSelectedWindows(((SelectableNode)n),offsetForAllX, offsetForAllY);
+//                }
             }
 
             if (closestXNode != null) {
